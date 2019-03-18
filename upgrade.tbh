@@ -8,6 +8,8 @@ declare upload_started as boolean
 declare dns_socket, upgrade_socket as byte
 declare device_name as string
 
+declare sub device_firmware_read_data(byref data as string, byref count as dword)
+
 
 
 type pl_manifest

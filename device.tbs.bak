@@ -26,8 +26,29 @@ sub init_LEDS()
 	beep.divider=21600
 	beep.play("BB",PL_BEEP_CANINT)
 	pat.play(PAT_THREE_SHORT_BOTH,PL_PAT_CANINT)
-	delay_ms(2000)
+	sys.timercountms=0
+	while sys.timercountms<2000
+	wend
 	pat.play(PAT_ONE_SHORT_GREEN,PL_PAT_CANINT)
+end sub
+
+sub set_LED(pattern as byte)
+
+	dim f,x as byte
+	dim s as string(8)
+	
+	s=mid(bin(pattern),3,8)
+	s=strgen(8-len(s),"0")+s	
+	
+	'make 5 clocks
+	io.num=PL_IO_NUM_47
+	for f=0 to 4
+		x=1-val(mid(s,f+4,1))
+		io.lineset(PL_IO_NUM_48,x)
+		io.state=LOW
+		io.state=HIGH
+	next f
+	
 end sub
 
 
@@ -37,8 +58,8 @@ sub init_sockets()
 
 	for f=12 to 15
 		sock.num=f
-		sock.txbuffrq(1)
-		sock.varbuffrq(1)
+		sock.txbuffrq(2)
+		sock.varbuffrq(2)
 		sock.redir(PL_REDIR_SOCK0 + sock.num)
 		sock.protocol=PL_SOCK_PROTOCOL_TCP
 		sock.inconmode=PL_SOCK_INCONMODE_ANY_IP_ANY_PORT
@@ -87,12 +108,11 @@ function connect_to_ap(byref ap_name as string, security_mode as pl_wln_security
 #endif
 	
 #if SRC_LIB_VER < &h020003
-'	connect_to_ap=wln_start(ap_name,security_mode,pmk,domain)
+	connect_to_ap=wln_start(ap_name,security_mode,pmk,domain)
 #endif
 
 #if SRC_LIB_VER >= &h020003
-	wln.boot(0)
-'	connect_to_ap=wln_start(ap_name,security_mode,pmk,domain,YES,PL_WLN_ASCAN_INFRASTRUCTURE)
+	connect_to_ap=wln_start(ap_name,security_mode,pmk,domain,YES,PL_WLN_ASCAN_INFRASTRUCTURE)
 #endif
 
 end function
